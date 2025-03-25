@@ -1,7 +1,7 @@
 name: "Deployment Infra"
 
 on:
-  workflow_call:
+  workflow_dispatch:
 
 jobs:
   deploy:
