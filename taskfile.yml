@@ -3,7 +3,7 @@ version: "3"
 dotenv: [".env"]
 
 env:
-  GOOGLE_APPLICATION_CREDENTIALS_PATH: "{{.TASKFILE_DIR}}/secrets/functions_credentials_file.json"
+  GOOGLE_APPLICATION_CREDENTIALS: "{{.TASKFILE_DIR}}/secrets/functions_credentials_file.json"
 
 tasks:
   default:
@@ -46,7 +46,7 @@ tasks:
     desc: "Authenticate to gcloud project"
     cmds:
       - task write-credential-key
-      - gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS_PATH
+      - gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
   write-credential-key:
     desc: "Create GCP credential file from base64 variable"
@@ -55,10 +55,10 @@ tasks:
       vars:
         - GOOGLE_SERVICE_ACCOUNT_BASE64
     dir: "{{.TASKFILE_DIR}}"
-    cmd: echo "$GOOGLE_SERVICE_ACCOUNT_BASE64" | base64 --decode > $GOOGLE_APPLICATION_CREDENTIALS_PATH
+    cmd: echo "$GOOGLE_SERVICE_ACCOUNT_BASE64" | base64 --decode > $GOOGLE_APPLICATION_CREDENTIALS
 
   clean-credential-key:
     desc: "Delete GCP credential file"
     silent: true
     dir: "{{.TASKFILE_DIR}}"
-    cmd: rm -f $GOOGLE_APPLICATION_CREDENTIALS_PATH
+    cmd: rm -f $GOOGLE_APPLICATION_CREDENTIALS
