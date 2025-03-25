@@ -1,0 +1,39 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+      - id: trailing-whitespace
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: debug-statements
+      - id: check-added-large-files
+      - id: check-byte-order-marker
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-docstring-first
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.13.0
+    hooks:
+      - id: commitizen
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.3
+    hooks:
+      - id: ruff
+      - id: ruff-format
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.83.4
+    hooks:
+      - id: terraform_fmt
+        name: Terraform fmt
+      - id: terraform_tflint
+        name: Terraform TFLint
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/src/terraform/.tflint.hcl

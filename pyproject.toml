@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.poetry]
+name = "gcp-function-project"
+version = "0.1.0"
+description = "Google Cloud Function project"
+package-mode = false
+
+[tool.poetry.dependencies]
+functions-framework="3.8.2"
+python = "^3.11"
+requests="2.32.3"
+geopy="2.4.1"
+google-cloud-pubsub="2.29.0"
+
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"

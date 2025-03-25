@@ -1,0 +1,11 @@
+.env
+.venv
+.vscode
+secrets/*
+!.gitkeep
+.terraform
+__pycache__
+*.zip
+!.gitkeep
+tf.plan
+.DS_STORE
