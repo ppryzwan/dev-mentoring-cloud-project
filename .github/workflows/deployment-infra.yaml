@@ -16,39 +16,19 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
 
-      - name: Convert GitHub secrets to Terraform variables
-        run: |
-          for var in $(compgen -e | grep "^TF_VAR_"); do
-            value=${!var}
-            var_name=${var#TF_VAR_}
-            
-            # Special case for API_KEY which stays uppercase
-            if [[ "$var_name" == "API_KEY" ]]; then
-              echo "API_KEY=$value" >> $GITHUB_ENV
-            else
-              # Convert other variables to lowercase
-              lowercase_name=$(echo "$var_name" | tr '[:upper:]' '[:lower:]')
-              echo "$lowercase_name=$value" >> $GITHUB_ENV
-            fi
-          done
-            echo -e "\nFinal environment variables:"
-            compgen -e | sort | while read var; do
-              echo "  $var=${!var}"
-            done
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.9.0
 
-      # - name: Install devbox
-      #   uses: jetify-com/devbox-install-action@v0.9.0
+      - name: Lint action
+        run: devbox run task lint
 
-      # - name: Lint action
-      #   run: devbox run task lint
+      - name: Test action
+        run: devbox run task test
 
-      # - name: Test action
-      #   run: devbox run task test
+      - name: Build
+        id: build
+        run: devbox run task build
 
-      # - name: Build
-      #   id: build
-      #   run: devbox run task build
-
-      # - name: Deploy
-      #   id: deploy
-      #   run: devbox run task deploy
+      - name: Deploy
+        id: deploy
+        run: devbox run task deploy

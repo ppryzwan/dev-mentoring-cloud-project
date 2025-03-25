@@ -48,7 +48,7 @@ variable "project_id" {
   type = string
 }
 
-variable "API_KEY" {
+variable "api_key" {
   type      = string
   sensitive = true
 }

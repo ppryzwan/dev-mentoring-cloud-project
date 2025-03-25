@@ -87,7 +87,7 @@ resource "google_cloudfunctions2_function" "weather_function" {
     environment_variables = {
       PUBSUB_TOPIC = var.weather_topic_name
       PROJECT_ID   = var.project_id
-      API_KEY      = var.API_KEY
+      API_KEY      = var.api_key
     }
   }
 }
@@ -115,7 +115,7 @@ resource "google_cloudfunctions2_function" "air_pollution_function" {
     environment_variables = {
       PUBSUB_TOPIC = var.polution_topic_name
       PROJECT_ID   = var.project_id
-      API_KEY      = var.API_KEY
+      API_KEY      = var.api_key
     }
   }
 }
