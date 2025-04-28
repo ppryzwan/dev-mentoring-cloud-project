@@ -1,0 +1,16 @@
+main:
+  steps:
+    - init:
+        assign:
+          - address_value: "${address}"
+    - executeFunctionPOST:
+        call: http.post
+        args:
+          url: "${function_url}"
+          auth:
+            type: OIDC
+          body:
+            address: $${address_value}
+        result: the_message
+    - return_value:
+        return: $${the_message.body}

@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "AirPollutionData",
+  "namespace": "com.example",
+  "fields": [
+    {"name": "address", "type": "string"},
+    {"name": "location_lattitude", "type": "double"},
+    {"name": "location_longitude", "type": "double"},
+    {"name": "air_pollution", "type": {
+      "type": "record",
+      "name": "AirPollutionDetails",
+      "fields": [
+        {"name": "qualitive_name", "type": "string"},
+        {"name": "co", "type": "double"},
+        {"name": "no", "type": "double"},
+        {"name": "no2", "type": "double"},
+        {"name": "o3", "type": "double"},
+        {"name": "so2", "type": "double"},
+        {"name": "pm10", "type": "double"},
+        {"name": "pm2_5", "type": "double"}
+      ]
+    }}
+  ]
+}

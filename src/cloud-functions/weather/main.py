@@ -11,16 +11,15 @@ from google.cloud import pubsub_v1
 @functions_framework.http
 def getWeather(request):
     env_vars = {key: value for key, value in os.environ.items()}
+    api_url = "https://api.openweathermap.org/data/2.5/weather?"
     try:
-        if request.method == "GET":
-            query_params = request.args
-            address_data = query_params.get("address", "Warszawa")
-
+        if request.method == "POST":
+            body_params = request.get_json()
+            address_data = body_params.get("address", "Warszawa")
             geolocator = Nominatim(user_agent="weather-agent")
             location = geolocator.geocode(address_data)
-
-            api_url = "https://api.openweathermap.org/data/2.5/weather?"
             project_id = os.environ.get("PROJECT_ID")
+
             topic_name = os.environ.get("PUBSUB_TOPIC")
             if not project_id or not topic_name:
                 return jsonify(

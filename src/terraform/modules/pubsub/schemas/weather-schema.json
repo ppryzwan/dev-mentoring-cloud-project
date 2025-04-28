@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "WeatherData",
+  "namespace": "com.example",
+  "fields": [
+    {"name": "address", "type": "string"},
+    {"name": "location_lattitude", "type": "double"},
+    {"name": "location_longitude", "type": "double"},
+    {"name": "weather", "type": {
+      "type": "record",
+      "name": "WeatherDetails",
+      "fields": [
+        {"name": "temperature", "type": "double"},
+        {"name": "humidity", "type": "int"},
+        {"name": "pressure", "type": "int"},
+        {"name": "temp_max", "type": "double"},
+        {"name": "temp_min", "type": "double"},
+        {"name": "weather_description", "type": "string"}
+      ]
+    }},
+    {"name": "datetime", "type": "string"}
+  ]
+}

@@ -9,3 +9,4 @@ __pycache__
 !.gitkeep
 tf.plan
 .DS_STORE
+src/dist_functions/*

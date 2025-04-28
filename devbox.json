@@ -13,7 +13,11 @@
     ],
     "shell": {
       "init_hook": [
-        "pre-commit install --hook-type commit-msg"
+        "pre-commit install --hook-type commit-msg",
+        "eval $(cat $DEVBOX_PROJECT_ROOT/.env | sed 's/^/export /')"
       ]
+    },
+    "env":{
+      "GOOGLE_APPLICATION_CREDENTIALS": "${DEVBOX_PROJECT_ROOT}/secrets/functions_credentials_file.json"
     }
   }

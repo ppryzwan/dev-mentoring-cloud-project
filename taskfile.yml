@@ -28,6 +28,7 @@ tasks:
     dir: src/terraform
     deps: [authenticate]
     cmds:
+      - task prepare-functions
       - terraform init
       - terraform plan -out tf.plan
       - task clean-credential-key
@@ -41,6 +42,8 @@ tasks:
       - terraform apply  tf.plan
       - task clean-credential-key
       - rm -f tf.plan
+      - find "src/dist_functions" -type f -not -name ".gitkeep" -delete
+      - find "src/dist_functions" -type d -empty -delete
 
   authenticate:
     desc: "Authenticate to gcloud project"
@@ -62,3 +65,10 @@ tasks:
     silent: true
     dir: "{{.TASKFILE_DIR}}"
     cmd: rm -f $GOOGLE_APPLICATION_CREDENTIALS
+
+  prepare-functions:
+    desc: "Prepare functions for deployment"
+    deps: [authenticate]
+    dir: "{{.TASKFILE_DIR}}"
+    cmds:
+      - bash prepare-files.sh
