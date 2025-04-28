@@ -42,8 +42,8 @@ tasks:
       - terraform apply  tf.plan
       - task clean-credential-key
       - rm -f tf.plan
-      - find "src/dist_functions" -type f -not -name ".gitkeep" -delete
-      - find "src/dist_functions" -type d -empty -delete
+      - cd "{{.TASKFILE_DIR}}" && find "src/dist_functions" -type f -not -name ".gitkeep" -delete
+      - cd "{{.TASKFILE_DIR}}" &&  find "src/dist_functions" -type d -empty -delete
 
   authenticate:
     desc: "Authenticate to gcloud project"
