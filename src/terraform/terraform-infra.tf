@@ -36,7 +36,7 @@ module "function-air-pollution" {
   function_name    = "air_pollution"
   description      = "Air pollution function"
   available_memory = "256Mi"
-  timeout_seconds  = 60
+  timeout_seconds  = 180
   entry_point      = "getPolution"
   region           = var.REGION
   environment_variables = {
@@ -56,7 +56,7 @@ module "function-weather" {
   function_name    = "weather"
   description      = "Weather function"
   available_memory = "256Mi"
-  timeout_seconds  = 60
+  timeout_seconds  = 180
   entry_point      = "getWeather"
   region           = var.REGION
   environment_variables = {
@@ -78,7 +78,7 @@ module "function-weather-transform" {
   function_name    = "weather_transformation"
   description      = "Weather transformfunction"
   available_memory = "256Mi"
-  timeout_seconds  = 60
+  timeout_seconds  = 180
   entry_point      = "weatherTransform"
   region           = var.REGION
   environment_variables = {
@@ -98,7 +98,7 @@ module "function-air-pollution-transform" {
   function_name    = "air_pollution_transformation"
   description      = "Air pollution transform function"
   available_memory = "256Mi"
-  timeout_seconds  = 60
+  timeout_seconds  = 180
   entry_point      = "airPolutionTransform"
   region           = var.REGION
   environment_variables = {
@@ -117,7 +117,7 @@ module "function-pub-sub" {
   pubsub_function_name = "pubsub_function"
   description          = "Pubsub function"
   available_memory     = "256Mi"
-  timeout_seconds      = 60
+  timeout_seconds      = 180
   entry_point          = "subscribePubsub"
   pubsub_topics        = module.pubsub.topic_names
   region               = var.REGION
