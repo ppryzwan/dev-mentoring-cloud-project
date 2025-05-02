@@ -26,7 +26,7 @@ tasks:
   build:
     desc: "Run terraform plan on all modules"
     dir: src/terraform
-    deps: [authenticate]
+    deps: [authenticate, install_packages]
     cmds:
       - task prepare-functions
       - terraform init
@@ -35,7 +35,7 @@ tasks:
 
   deploy:
     desc: "Run terraform apply"
-    deps: [authenticate]
+    deps: [authenticate, install_packages]
     dir: src/terraform
     cmds:
       - terraform init
@@ -68,7 +68,11 @@ tasks:
 
   prepare-functions:
     desc: "Prepare functions for deployment"
-    deps: [authenticate]
+    deps: [authenticate, install_packages]
     dir: "{{.TASKFILE_DIR}}"
     cmds:
       - bash prepare-files.sh
+
+  install_packages:
+    desc: "Install packages"
+    cmd: poetry install
