@@ -4,7 +4,7 @@
       "commitizen@latest",
       "git@latest",
       "go-task@latest",
-      "terraform@1.7.2",
+      // "terraform@1.7.2",
       "google-cloud-sdk@latest",
       "poetry@latest",
       "python@3.11.9",

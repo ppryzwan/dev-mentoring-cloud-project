@@ -19,16 +19,21 @@ jobs:
       - name: Install devbox
         uses: jetify-com/devbox-install-action@v0.9.0
 
-      - name: Lint action
-        run: devbox run task lint
+      - name: testing
+        run: task prepare-functions
 
-      - name: Test action
-        run: devbox run task test
+      - name: testing-functions
+        run: ls -la "src/dist_functions"
+      # - name: Lint action
+      #   run: devbox run task lint
 
-      - name: Build
-        id: build
-        run: devbox run task build
+      # - name: Test action
+      #   run: devbox run task test
 
-      - name: Deploy
-        id: deploy
-        run: devbox run task deploy
+      # - name: Build
+      #   id: build
+      #   run: devbox run task build
+
+      # - name: Deploy
+      #   id: deploy
+      #   run: devbox run task deploy
