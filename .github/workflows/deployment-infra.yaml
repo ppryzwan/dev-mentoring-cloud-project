@@ -20,7 +20,7 @@ jobs:
         uses: jetify-com/devbox-install-action@v0.9.0
 
       - name: testing
-        run: task prepare-functions
+        run: devbox run task prepare-functions
 
       - name: testing-functions
         run: ls -la "src/dist_functions"
