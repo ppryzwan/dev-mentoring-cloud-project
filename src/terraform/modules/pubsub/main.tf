@@ -2,7 +2,7 @@
 resource "google_pubsub_schema" "topic_schemas" {
   for_each = toset(var.topics)
 
-  name       = "${each.value}-schema"
+  name       = "${var.topic_prefix}-${each.value}-schema"
   type       = "AVRO"
   definition = file("${path.module}/schemas/${each.value}-schema.json")
 }
