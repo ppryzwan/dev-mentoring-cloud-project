@@ -10,12 +10,13 @@ description = "Google Cloud Function project"
 package-mode = false
 
 [tool.poetry.dependencies]
-functions-framework="3.8.2"
+functions-framework = "3.8.2"
 python = "^3.11"
-requests="2.32.3"
-geopy="2.4.1"
-google-cloud-pubsub="2.29.0"
-google-cloud-storage="3.1.0"
+requests = "2.32.3"
+geopy = "2.4.1"
+google-cloud-pubsub = "2.29.0"
+google-cloud-storage = "3.1.0"
+google-cloud-secret-manager = "2.24.0"
 
 [tool.poetry.requires-plugins]
 poetry-plugin-export = ">=1.8"

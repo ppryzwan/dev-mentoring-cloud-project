@@ -15,32 +15,7 @@ variable "ZONE" {
   default     = "us-central1-a"
 }
 
-variable "VERSION_STORAGE" {
-  type    = bool
-  default = false
-}
-variable "STORAGE_CLASS" {
+variable "AIR_POLLUTION_API_KEY" {
   type    = string
-  default = "STANDARD"
-}
-variable "BUCKET_FUNCTIONS_NAME" {
-  type    = string
-  default = "functions-code-bucket"
-}
-variable "TOPICS" {
-  description = "List of Pub/Sub topics to create"
-  type        = list(string)
-}
-variable "TOPIC_PREFIX" {
-  description = "Prefix to be used in resource names"
-  type        = string
-}
-variable "API_KEY" {
-  type      = string
-  sensitive = true
-}
-
-variable "CRON_EXPRESSION" {
-  type    = string
-  default = "0 */12 * * *"
+  default = "value"
 }

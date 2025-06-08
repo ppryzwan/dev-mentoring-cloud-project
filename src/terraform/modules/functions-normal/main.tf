@@ -1,8 +1,18 @@
 resource "google_storage_bucket_object" "function_zip" {
-  name   = "${var.function_name}-${filemd5(var.zip_path)}.zip"
-  source = var.zip_path
+  name   = "${storage_folder_name}/${var.zip_file_name}.zip"
   bucket = var.bucket_functions_name
+  source = "${var.functions_zip_file_path}/${var.zip_file_name}.zip"
+
+  lifecycle {
+    ignore_changes = [
+      source,
+      content,
+      md5hash,
+      crc32c
+    ]
+  }
 }
+
 
 resource "google_cloudfunctions2_function" "function-normal" {
   name        = var.function_name
@@ -18,6 +28,9 @@ resource "google_cloudfunctions2_function" "function-normal" {
         object = google_storage_bucket_object.function_zip.name
       }
     }
+  }
+  lifecycle {
+    ignore_changes = [build_config[0].source[0].storage_source[0].object]
   }
 
   service_config {

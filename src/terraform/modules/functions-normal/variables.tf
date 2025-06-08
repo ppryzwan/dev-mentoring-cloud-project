@@ -9,11 +9,10 @@ variable "runtime" {
   default = "python311"
 }
 
-variable "function_name" {
+variable "zip_file_name" {
   type = string
 }
-
-variable "zip_path" {
+variable "functions_zip_file_path" {
   type = string
 }
 
@@ -21,14 +20,16 @@ variable "bucket_functions_name" {
   type = string
 }
 
-
-variable "project_id" {
+variable "function_name" {
   type = string
 }
 
-variable "api_key" {
-  type      = string
-  sensitive = true
+variable "storage_folder_name" {
+  type = string
+}
+
+variable "project_id" {
+  type = string
 }
 
 

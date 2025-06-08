@@ -92,7 +92,7 @@ tasks:
       - echo $workspace
       - task prepare-functions
       - |
-        if terraform workspace list | grep -q " ${workspace}\$"; then 
+        if terraform workspace list | grep -q " ${workspace}\$"; then
           terraform workspace select $workspace
           echo "Selected workspace: $workspace"
           echo "Deleting the infrastreucture for workspace"

@@ -1,4 +1,4 @@
-from google.cloud import storage
+from google.cloud import storage, secretmanager
 
 
 def check_bucket(bucket_name, path):
@@ -12,3 +12,10 @@ def check_bucket(bucket_name, path):
         print(f"Path {path} created in bucket {bucket_name}")
     else:
         print(f"Path {path} already exists in bucket {bucket_name}")
+
+
+def get_secret(secret_id, project_id):
+    client = secretmanager.SecretManagerServiceClient()
+    name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
+    response = client.access_secret_version(request={"name": name})
+    return response.payload.data.decode("UTF-8")
