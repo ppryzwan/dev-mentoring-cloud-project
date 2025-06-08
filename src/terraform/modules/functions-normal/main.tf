@@ -1,5 +1,5 @@
 resource "google_storage_bucket_object" "function_zip" {
-  name   = "${storage_folder_name}/${var.zip_file_name}.zip"
+  name   = "${var.storage_folder_name}/${var.zip_file_name}.zip"
   bucket = var.bucket_functions_name
   source = "${var.functions_zip_file_path}/${var.zip_file_name}.zip"
 
@@ -7,8 +7,6 @@ resource "google_storage_bucket_object" "function_zip" {
     ignore_changes = [
       source,
       content,
-      md5hash,
-      crc32c
     ]
   }
 }
@@ -39,3 +37,4 @@ resource "google_cloudfunctions2_function" "function-normal" {
     environment_variables = var.environment_variables
   }
 }
+# Adjusting the code

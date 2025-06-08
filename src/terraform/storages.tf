@@ -5,7 +5,7 @@ module "storage-functions" {
   region                = var.REGION
   version_storage       = false
   storage_class         = "STANDARD"
-
+  depends_on = [ google_project_service.storage, google_project_service.cloudresourcemanager]
 }
 
 module "storage-data" {
@@ -15,4 +15,5 @@ module "storage-data" {
   region                = var.REGION
   version_storage       = false
   storage_class         = "STANDARD"
+  depends_on = [ google_project_service.storage ]
 }

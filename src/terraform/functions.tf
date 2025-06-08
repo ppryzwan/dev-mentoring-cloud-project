@@ -16,16 +16,16 @@ module "function-air-pollution" {
   timeout_seconds         = 180
   entry_point             = "getPolution"
   zip_file_name           = "air_pollution"
-  storage_folder_name     = locals.storage_folder_name
+  storage_folder_name     = local.storage_folder_name
   functions_zip_file_path = local.functions_zip_file_path
   environment_variables = {
-    PUBSUB_TOPIC = module.pubsub-weather.topic_names["air-polution"]
+    PUBSUB_TOPIC = module.pubsub-air-pollution.topic_names["air-polution"]
     PROJECT_ID   = var.PROJECT_ID
     API_KEY      = var.AIR_POLLUTION_API_KEY
   }
   bucket_functions_name = module.storage-functions.bucket_name
 
-  depends_on = [module.storage-functions, module.pubsub-weather, module.storage-data]
+  depends_on = [module.storage-functions, module.pubsub-weather, module.storage-data, google_project_service.cloudrun, google_project_service.cloudfunctions, google_project_service.cloudbuild, google_project_service.secretmanager, google_project_service.cloudresourcemanager]
 
 }
 
@@ -39,10 +39,10 @@ module "function-weather" {
   timeout_seconds         = 180
   entry_point             = "getWeather"
   zip_file_name           = "weather"
-  storage_folder_name     = locals.storage_folder_name
+  storage_folder_name     = local.storage_folder_name
   functions_zip_file_path = local.functions_zip_file_path
   environment_variables = {
-    PUBSUB_TOPIC = module.pubsub-weather.topic_names["air-polution"]
+    PUBSUB_TOPIC = module.pubsub-weather.topic_names["weather"]
     PROJECT_ID   = var.PROJECT_ID
     API_KEY      = var.AIR_POLLUTION_API_KEY
   }
