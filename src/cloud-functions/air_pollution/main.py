@@ -104,3 +104,4 @@ def getPolution(request):
             ), 405
     except Exception as e:
         return jsonify({"error": "Something went wrong", "message": str(e)}), 500
+#Testing the script
