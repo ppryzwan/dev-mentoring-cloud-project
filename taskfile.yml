@@ -76,3 +76,31 @@ tasks:
   install_packages:
     desc: "Install packages"
     cmd: poetry install
+
+  initialize-workspace:
+    dir: "{{.TASKFILE_DIR}}"
+    desc: "Initialize terraform workspace"
+    cmd: bash terraform-workspaces.sh
+
+  delete_workspace:
+    dir: "{{.TASKFILE_DIR}}/src/terraform"
+    deps: [authenticate, install_packages]
+    desc: "Delete terraform workspace"
+    env:
+      workspace: "{{.workspace_name}}"
+    cmds:
+      - echo $workspace
+      - task prepare-functions
+      - |
+        if terraform workspace list | grep -q " ${workspace}\$"; then
+          terraform workspace select $workspace
+          echo "Selected workspace: $workspace"
+          echo "Deleting the infrastreucture for workspace"
+          terraform destroy -auto-approve
+          terraform workspace select default
+          terraform workspace delete $workspace
+        else
+          echo "Workspace '$workspace' doesn't exist, nothing to delete"
+        fi
+      - cd "{{.TASKFILE_DIR}}" && find "src/dist_functions" -type f -not -name ".gitkeep" -delete
+      - cd "{{.TASKFILE_DIR}}" &&  find "src/dist_functions" -type d -empty -delete

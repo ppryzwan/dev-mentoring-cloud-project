@@ -5,6 +5,7 @@ import functions_framework
 from geopy.geocoders import Nominatim
 from flask import jsonify
 from google.cloud import pubsub_v1
+from utils import get_secret
 
 
 @functions_framework.http
@@ -31,12 +32,34 @@ def getPolution(request):
 
             publisher = pubsub_v1.PublisherClient()
             topic_path = publisher.topic_path(project_id, topic_name)
-            params = {
-                "lat": round(location.latitude, 4),
-                "lon": round(location.longitude, 4),
-                "appid": env_vars.get("API_KEY"),
-            }
-            response = requests.get(api_url, params=params)
+            try:
+                params = {
+                    "lat": round(location.latitude, 4),
+                    "lon": round(location.longitude, 4),
+                    "appid": env_vars.get("API_KEY"),
+                }
+                response = requests.get(api_url, params=params)
+                if response.status_code in [401, 403]:
+                    raise Exception("Invalid API key")
+                response.raise_for_status()
+            except Exception:
+                try:
+                    backup_api_key = get_secret("API-weather", project_id)
+                    params = {
+                        "lat": round(location.latitude, 4),
+                        "lon": round(location.longitude, 4),
+                        "appid": backup_api_key,
+                    }
+                    response = requests.get(api_url, params=params)
+                    response.raise_for_status()
+                except Exception as e:
+                    return jsonify(
+                        {
+                            "error": "Error getting data from API",
+                            "message": str(e),
+                        },
+                        500,
+                    )
             air_data = response.json()
             quality_names = {
                 1: "good",

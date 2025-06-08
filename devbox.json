@@ -14,7 +14,8 @@
     "shell": {
       "init_hook": [
         "pre-commit install --hook-type commit-msg",
-        "eval $(cat $DEVBOX_PROJECT_ROOT/.env | sed 's/^/export /')"
+        "eval $(cat $DEVBOX_PROJECT_ROOT/.env | sed 's/^/export /')",
+        "task initialize-workspace"
       ]
     },
     "env":{
