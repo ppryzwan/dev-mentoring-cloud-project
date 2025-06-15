@@ -1,16 +1,12 @@
+locals{
+  function_dir = "${path.cwd}/../dist_functions"
+}
+
 resource "google_storage_bucket_object" "function_zip" {
   name   = "${var.storage_folder_name}/${var.zip_file_name}.zip"
   bucket = var.bucket_functions_name
-  source = "${var.functions_zip_file_path}/${var.zip_file_name}.zip"
-
-  lifecycle {
-    ignore_changes = [
-      source,
-      content,
-    ]
-  }
+  source = "${local.function_dir}/${var.zip_file_name}.zip"
 }
-
 
 resource "google_cloudfunctions2_function" "function-normal" {
   name        = var.function_name
@@ -27,9 +23,6 @@ resource "google_cloudfunctions2_function" "function-normal" {
       }
     }
   }
-  lifecycle {
-    ignore_changes = [build_config[0].source[0].storage_source[0].object]
-  }
 
   service_config {
     available_memory      = var.available_memory
@@ -37,4 +30,3 @@ resource "google_cloudfunctions2_function" "function-normal" {
     environment_variables = var.environment_variables
   }
 }
-# Adjusting the code

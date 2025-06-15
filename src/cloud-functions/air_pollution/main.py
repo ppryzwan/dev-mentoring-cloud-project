@@ -90,7 +90,7 @@ def getPolution(request):
             return jsonify(
                 {
                     "status": "success",
-                    "message": f"Message published to {topic_name}",
+                    "message": f"Message (tutaj_niewielka_zmiana) published to {topic_name}",
                     "messageId": message_id,
                 },
                 200,

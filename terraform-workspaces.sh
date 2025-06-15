@@ -5,6 +5,8 @@ BRANCH_NAME=$(git branch --show-current)
 
 if [[ "$BRANCH_NAME" == *"feature/"* ]]; then
   WORKSPACE=${BRANCH_NAME#*feature/}
+elif [[ "$BRANCH_NAME" == *"bugfix/"* ]]; then
+  WORKSPACE=${BRANCH_NAME#*bugfix/}
 else
   WORKSPACE="default"
 fi
@@ -25,4 +27,5 @@ if [[ "$operation" == "create" ]]; then
           fi
 
 elif [[ "$operation" == "delete" ]]; then
+
 fi

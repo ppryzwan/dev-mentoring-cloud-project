@@ -2,7 +2,8 @@
 
 CLOUD_FUNCTIONS_DIR="src/cloud-functions"
 
-changed_files=$(git diff --name-only HEAD -- "$CLOUD_FUNCTIONS_DIR/" 2>/dev/null)
+all_changed_files=$(git diff-tree --no-commit-id --name-only -r HEAD 2>/dev/null)
+changed_files=$(echo "$all_changed_files" | grep "^$CLOUD_FUNCTIONS_DIR/")
 
 if [ -z "$changed_files" ]; then
     echo "No changes detected in $CLOUD_FUNCTIONS_DIR"
@@ -30,7 +31,6 @@ for file in $all_changed_files; do
 done
 
 if [ "$utils_changed" = true ]; then
-    echo "utils.py has changes - all functions need to be rebuilt:"
     for dir in "$CLOUD_FUNCTIONS_DIR"/*/; do
         if [ -d "$dir" ]; then
             folder_name=$(basename "$dir")
@@ -41,10 +41,5 @@ if [ "$utils_changed" = true ]; then
 fi
 
 if [ -n "$changed_folders" ]; then
-    echo "Changed cloud functions:"
-    for folder in $changed_folders; do
-        echo "  - $folder"
-    done
-else
-    echo "No function folders have changes."
+    echo $changed_folders
 fi

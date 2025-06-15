@@ -28,7 +28,7 @@ tasks:
     dir: src/terraform
     deps: [authenticate, install_packages]
     cmds:
-      - task prepare-functions
+      - task prepare-functions-for-deploy
       - terraform init
       - terraform plan -out tf.plan
       - task clean-credential-key
@@ -51,6 +51,13 @@ tasks:
       - task write-credential-key
       - gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
+  prepare-functions-for-deploy:
+    desc: "Prepare functions for deployment"
+    deps: [authenticate, install_packages]
+    dir: "{{.TASKFILE_DIR}}"
+    cmds:
+      - bash prepare-files.sh
+
   write-credential-key:
     desc: "Create GCP credential file from base64 variable"
     silent: true
@@ -65,13 +72,6 @@ tasks:
     silent: true
     dir: "{{.TASKFILE_DIR}}"
     cmd: rm -f $GOOGLE_APPLICATION_CREDENTIALS
-
-  prepare-functions:
-    desc: "Prepare functions for deployment"
-    deps: [authenticate, install_packages]
-    dir: "{{.TASKFILE_DIR}}"
-    cmds:
-      - bash prepare-files.sh
 
   install_packages:
     desc: "Install packages"
