@@ -25,12 +25,11 @@ tasks:
 
   build:
     desc: "Run terraform plan on all modules"
-    dir: src/terraform
+    dir: "{{.TASKFILE_DIR}}"
     deps: [authenticate, install_packages]
     cmds:
       - task prepare-functions-for-deploy
-      - terraform init
-      - terraform plan -out tf.plan
+      - bash terraform-plan.sh
       - task clean-credential-key
 
   deploy:
@@ -78,29 +77,26 @@ tasks:
     cmd: poetry install
 
   initialize-workspace:
+    deps: [authenticate, install_packages]
     dir: "{{.TASKFILE_DIR}}"
     desc: "Initialize terraform workspace"
-    cmd: bash terraform-workspaces.sh
+    vars:
+      BRANCH_NAME:
+        sh: git branch --show-current
+    env:
+      BRANCH_NAME: "{{.BRANCH_NAME | default .BRANCH_NAME}}"
+    cmds:
+      - bash terraform-workspaces.sh create $BRANCH_NAME
+      - touch target_modules
 
   delete_workspace:
-    dir: "{{.TASKFILE_DIR}}/src/terraform"
+    dir: "{{.TASKFILE_DIR}}"
     deps: [authenticate, install_packages]
-    desc: "Delete terraform workspace"
+    vars:
+      BRANCH_NAME:
+        sh: git branch --show-current
+    desc: "Delete terraform workspace and clean up modules compared to the PRD"
     env:
-      workspace: "{{.workspace_name}}"
+      BRANCH_NAME: "{{.BRANCH_NAME | default .BRANCH_NAME}}"
     cmds:
-      - echo $workspace
-      - task prepare-functions
-      - |
-        if terraform workspace list | grep -q " ${workspace}\$"; then
-          terraform workspace select $workspace
-          echo "Selected workspace: $workspace"
-          echo "Deleting the infrastreucture for workspace"
-          terraform destroy -auto-approve
-          terraform workspace select default
-          terraform workspace delete $workspace
-        else
-          echo "Workspace '$workspace' doesn't exist, nothing to delete"
-        fi
-      - cd "{{.TASKFILE_DIR}}" && find "src/dist_functions" -type f -not -name ".gitkeep" -delete
-      - cd "{{.TASKFILE_DIR}}" &&  find "src/dist_functions" -type d -empty -delete
+      - bash terraform-workspaces.sh delete $BRANCH_NAME
