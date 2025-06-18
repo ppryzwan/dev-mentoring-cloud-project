@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 operation=$1
@@ -34,7 +33,7 @@ elif [[ "$operation" == "delete" ]]; then
         terraform workspace select "$WORKSPACE"
         echo "Selected workspace: $WORKSPACE"
         echo "Deleting old infrastructure for workspace"
-        terraform workspace select default 
+        terraform workspace select default
         terraform state list > default_resources.txt
         terraform workspace select "$WORKSPACE"
         terraform state list > workspace_resources.txt
@@ -58,7 +57,7 @@ elif [[ "$operation" == "delete" ]]; then
                 DESTROY_CMD="$DESTROY_CMD -target=\"$resource\""
             fi
         done <<< "$destroy_resources"
-        
+
         echo "Executing: $DESTROY_CMD"
         eval "$DESTROY_CMD"
         echo "Destroyed old infrastructure for workspace"

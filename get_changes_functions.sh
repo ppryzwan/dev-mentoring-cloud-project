@@ -15,14 +15,14 @@ utils_changed=false
 
 for file in $all_changed_files; do
     relative_path=${file#$CLOUD_FUNCTIONS_DIR/}
-    
+
     if [ "$relative_path" = "utils.py" ]; then
         utils_changed=true
         continue
     fi
 
     folder_name=$(echo "$relative_path" | cut -d'/' -f1)
-    
+
     if [ -d "$CLOUD_FUNCTIONS_DIR/$folder_name" ]; then
         if [[ ! " $changed_folders " =~ " $folder_name " ]]; then
             changed_folders="$changed_folders $folder_name"

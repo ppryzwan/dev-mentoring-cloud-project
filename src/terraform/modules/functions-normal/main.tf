@@ -1,4 +1,4 @@
-locals{
+locals {
   function_dir = "${path.cwd}/../dist_functions"
 }
 
