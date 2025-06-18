@@ -18,12 +18,12 @@ fi
 
 for FUNCTION_NAME in "$@"; do
     SUBFOLDER="$SOURCE_DIR/$FUNCTION_NAME"
-    
+
     if [ ! -d "$SUBFOLDER" ]; then
         echo "Warning: Function directory '$FUNCTION_NAME' not found. Skipping..."
         continue
     fi
-    
+
     echo "Processing $FUNCTION_NAME..."
     TEMP_DIR="$TARGET_DIR/$FUNCTION_NAME"
     mkdir -p "$TEMP_DIR"

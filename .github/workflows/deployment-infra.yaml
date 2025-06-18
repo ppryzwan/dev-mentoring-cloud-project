@@ -2,11 +2,38 @@ name: "Deployment Infra"
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
-  deploy:
+  deployment-dev:
     runs-on: ubuntu-latest
+    env:
+      DEPLOY_BRANCH_PATTERN: '^[0-9]+\.[0-9]*\.?x$|main'
+      ENVIRONMENT: DEV
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+      RELEASE: ${{ github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' }}
+      SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+      IS_PR_MERGED: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true }}
     steps:
+      - name: Checking if branch name is deployment branch
+        id: variables
+        run: |
+          if echo "${BRANCH_NAME}" | grep -Eq "${DEPLOY_BRANCH_PATTERN}"; then
+            echo "matching_branches=true" >> $GITHUB_OUTPUT
+          else
+            echo "matching_branches=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "${IS_PR_MERGED}" == "true" ]] && [[ -n "${SOURCE_BRANCH}" ]]; then
+            if echo "${SOURCE_BRANCH}" | grep -Eq "${DEPLOY_BRANCH_PATTERN}"; then
+              echo "source_branch_is_deploy_branch=true" >> $GITHUB_OUTPUT
+            else
+              echo "source_branch_is_deploy_branch=false" >> $GITHUB_OUTPUT
+            fi
+            echo "should_cleanup_workspace=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_cleanup_workspace=false" >> $GITHUB_OUTPUT
+          fi
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -18,6 +45,95 @@ jobs:
 
       - name: Install devbox
         uses: jetify-com/devbox-install-action@v0.9.0
+        with:
+          enable-cache: "true"
+
+      - name: Adjust environment secrets to standard secrets name
+        run: |
+          for var in $(compgen -e); do
+            if [[ $var == ${ENVIRONMENT}_* ]]; then
+              rest=${var#*_}
+              value=${!var}
+              printf "%s=%s\n" "$rest" "$value" >> $GITHUB_ENV
+            fi
+          done
+
+      - name: Lint action
+        run: devbox run task lint
+
+      - name: Test action
+        run: devbox run task test
+
+      - name: Bump version
+        id: bump_version
+        if: ${{ steps.variables.outputs.matching_branches == 'true' && env.RELEASE == 'false'}}
+        run: |
+          if devbox run cz bump --dry-run --yes; then
+             echo "[INFO] pushing bump updates to $BRANCH_NAME"
+             git config --global user.email "cicd@github.com"
+             git config --global user.name "cicd"
+             git fetch --prune --tags
+             devbox run cz bump --yes
+             echo "[INFO] pushing bump updates to $BRANCH_NAME"
+             git push origin $BRANCH_NAME  --tags
+           else
+             echo "No commits found for bumping version - skipping bumping version"
+           fi
+      - name: Build
+        id: build
+        if: ${{ steps.variables.outputs.matching_branches == 'true' || env.RELEASE == 'true' }}
+        run: devbox run task build
+
+      - name: Deploy
+        id: deploy
+        if: ${{ steps.variables.outputs.matching_branches == 'true' || env.RELEASE == 'true' }}
+        run: devbox run task deploy
+
+      - name: Remove old workspace
+        if: ${{ steps.variables.outputs.should_cleanup_workspace == 'true' && steps.variables.outputs.source_branch_is_deploy_branch == 'false' }}
+        run: devbox run task delete_workspace --BRANCH_NAME "${SOURCE_BRANCH}"
+
+  deployment-qa:
+    runs-on: ubuntu-latest
+    needs: deployment-dev
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' }}
+    env:
+      ENVIRONMENT: QA
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+      RELEASE: ${{ github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' }}
+      DEPLOY_BRANCH_PATTERN: '^[0-9]+\.[0-9]*\.?x$|main'
+    steps:
+      - name: Checking if branch name is deployment branch
+        id: variables
+        run: |
+          if echo "${BRANCH_NAME}" | grep -Eq "${DEPLOY_BRANCH_PATTERN}"; then
+            echo "matching_branches=true" >> $GITHUB_OUTPUT
+          else
+            echo "matching_branches=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: oNaiPs/secrets-to-env-action@v1
+        with:
+          secrets: ${{ toJSON(secrets) }}
+
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.9.0
+        with:
+          enable-cache: "true"
+
+      - name: Adjust environment secrets to standard secrets name
+        run: |
+          for var in $(compgen -e); do
+            if [[ $var == ${ENVIRONMENT}_* ]]; then
+              rest=${var#*_}
+              value=${!var}
+              printf "%s=%s\n" "$rest" "$value" >> $GITHUB_ENV
+            fi
+          done
 
       - name: Lint action
         run: devbox run task lint
@@ -27,8 +143,79 @@ jobs:
 
       - name: Build
         id: build
+        if: ${{ steps.variables.outputs.matching_branches == 'true' || env.RELEASE == 'true' }}
         run: devbox run task build
 
       - name: Deploy
         id: deploy
+        if: ${{ steps.variables.outputs.matching_branches == 'true' || env.RELEASE == 'true' }}
+        run: devbox run task deploy
+
+  request-approval:
+    needs: [deployment-qa]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: user1,user2
+          minimum-approvals: 1
+          issue-title: "Deploy to Production"
+
+  deployment-prd:
+    runs-on: ubuntu-latest
+    needs: request-approval
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' }}
+    env:
+      ENVIRONMENT: PRD
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+      RELEASE: ${{ github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' }}
+      DEPLOY_BRANCH_PATTERN: '^[0-9]+\.[0-9]*\.?x$|main'
+    steps:
+      - name: Checking if branch name is deployment branch
+        id: variables
+        run: |
+          if echo "${BRANCH_NAME}" | grep -Eq "${DEPLOY_BRANCH_PATTERN}"; then
+            echo "matching_branches=true" >> $GITHUB_OUTPUT
+          else
+            echo "matching_branches=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: oNaiPs/secrets-to-env-action@v1
+        with:
+          secrets: ${{ toJSON(secrets) }}
+
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.9.0
+        with:
+          enable-cache: "true"
+
+      - name: Adjust environment secrets to standard secrets name
+        run: |
+          for var in $(compgen -e); do
+            if [[ $var == ${ENVIRONMENT}_* ]]; then
+              rest=${var#*_}
+              value=${!var}
+              printf "%s=%s\n" "$rest" "$value" >> $GITHUB_ENV
+            fi
+          done
+
+      - name: Lint action
+        run: devbox run task lint
+
+      - name: Test action
+        run: devbox run task test
+
+      - name: Build
+        id: build
+        if: ${{ steps.variables.outputs.matching_branches == 'true' || env.RELEASE == 'true' }}
+        run: devbox run task build
+
+      - name: Deploy
+        id: deploy
+        if: ${{ steps.variables.outputs.matching_branches == 'true' || env.RELEASE == 'true' }}
         run: devbox run task deploy

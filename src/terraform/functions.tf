@@ -53,41 +53,48 @@ module "function-weather" {
 }
 
 
-## To uncomment in testing PR
-# module "function-weather-transform" {
-#   project_id       = var.PROJECT_ID
-#   api_key          = var.API_KEY
-#   source           = "./modules/functions-normal"
-#   zip_path         = "${path.cwd}/../dist_functions/weather_topic.zip"
-#   function_name    = "${local.environment}_weather_transformation"
-#   description      = "Weather transformfunction"
-#   available_memory = "256Mi"
-#   timeout_seconds  = 180
-#   entry_point      = "weatherTransform"
-#   region           = var.REGION
-#   environment_variables = {
-#     SUBSCRIPTION_PATH = module.pubsub.subscription_ids["weather"]
-#   }
-#   bucket_functions_name = module.storage.bucket_name
-#   depends_on            = [module.storage, module.pubsub]
-# }
+module "function-weather-transform" {
+  source                  = "./modules/functions-normal"
+  project_id              = var.PROJECT_ID
+  region                  = var.REGION
+  function_name           = "main_weather_transformation"
+  description             = "Weather Transformation function"
+  available_memory        = "256Mi"
+  timeout_seconds         = 180
+  entry_point             = "weatherTransform"
+  zip_file_name           = "weather_topic"
+  storage_folder_name     = local.storage_folder_name
+  functions_zip_file_path = local.functions_zip_file_path
+  environment_variables = {
+    PUBSUB_TOPIC = module.pubsub-weather.topic_names["weather"]
+    PROJECT_ID   = var.PROJECT_ID
+    API_KEY      = var.AIR_POLLUTION_API_KEY
+  }
+  bucket_functions_name = module.storage-functions.bucket_name
+
+  depends_on = [module.storage-functions, module.pubsub-weather, module.storage-data]
+
+}
 
 
+module "function-air-pollution-transform" {
+  source                  = "./modules/functions-normal"
+  project_id              = var.PROJECT_ID
+  region                  = var.REGION
+  function_name           = "main_air_pollution_transformation"
+  description             = "Air pollution Transformation function"
+  available_memory        = "256Mi"
+  timeout_seconds         = 180
+  entry_point             = "airPolutionTransform"
+  zip_file_name           = "air_pollution_topic"
+  storage_folder_name     = local.storage_folder_name
+  functions_zip_file_path = local.functions_zip_file_path
+  environment_variables = {
+    PUBSUB_TOPIC = module.pubsub-air-pollution.topic_names["air-polution"]
+    PROJECT_ID   = var.PROJECT_ID
+    API_KEY      = var.AIR_POLLUTION_API_KEY
+  }
+  bucket_functions_name = module.storage-functions.bucket_name
 
-# module "function-air-pollution-transform" {
-#   project_id       = var.PROJECT_ID
-#   api_key          = var.API_KEY
-#   source           = "./modules/functions-normal"
-#   zip_path         = "${path.cwd}/../dist_functions/air_pollution_topic.zip"
-#   function_name    = "${local.environment}_air_pollution_transformation"
-#   description      = "Air pollution transform function"
-#   available_memory = "256Mi"
-#   timeout_seconds  = 180
-#   entry_point      = "airPolutionTransform"
-#   region           = var.REGION
-#   environment_variables = {
-#     SUBSCRIPTION_PATH = module.pubsub.subscription_ids["air-polution"]
-#   }
-#   bucket_functions_name = module.storage.bucket_name
-#   depends_on            = [module.storage, module.pubsub]
-# }
+  depends_on = [module.storage-functions, module.pubsub-air-pollution, module.storage-data]
+}
