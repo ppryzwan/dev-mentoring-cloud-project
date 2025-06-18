@@ -16,7 +16,7 @@ else
 fi
 
 cd src/terraform
-
+terraform init
 if [[ "$operation" == "create" ]]; then
     if terraform workspace list | grep -q " ${WORKSPACE}\$"; then
         terraform workspace select "$WORKSPACE"
