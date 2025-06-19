@@ -43,11 +43,6 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
 
-      - name: Install devbox
-        uses: jetify-com/devbox-install-action@v0.9.0
-        with:
-          enable-cache: "true"
-
       - name: Adjust environment secrets to standard secrets name
         run: |
           for var in $(compgen -e); do
@@ -57,6 +52,13 @@ jobs:
               printf "%s=%s\n" "$rest" "$value" >> $GITHUB_ENV
             fi
           done
+
+          env >> $GITHUB_WORKSPACE/.env
+
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.9.0
+        with:
+          enable-cache: "true"
 
       - name: Lint action
         run: devbox run task lint
@@ -134,6 +136,7 @@ jobs:
               printf "%s=%s\n" "$rest" "$value" >> $GITHUB_ENV
             fi
           done
+          env >> $GITHUB_WORKSPACE/.env
 
       - name: Lint action
         run: devbox run task lint
@@ -193,6 +196,7 @@ jobs:
               printf "%s=%s\n" "$rest" "$value" >> $GITHUB_ENV
             fi
           done
+          env >> $GITHUB_WORKSPACE/.env
 
       - name: Lint action
         run: devbox run task lint
