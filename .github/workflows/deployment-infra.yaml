@@ -53,7 +53,7 @@ jobs:
             fi
           done
 
-          env >> $GITHUB_WORKSPACE/.env
+          env | grep '^TF_VAR_' >> $GITHUB_WORKSPACE/.env
 
       - name: Install devbox
         uses: jetify-com/devbox-install-action@v0.9.0
@@ -136,7 +136,7 @@ jobs:
               printf "%s=%s\n" "$rest" "$value" >> $GITHUB_ENV
             fi
           done
-          env >> $GITHUB_WORKSPACE/.env
+          env | grep '^TF_VAR_' >> $GITHUB_WORKSPACE/.env
 
       - name: Lint action
         run: devbox run task lint
@@ -196,7 +196,7 @@ jobs:
               printf "%s=%s\n" "$rest" "$value" >> $GITHUB_ENV
             fi
           done
-          env >> $GITHUB_WORKSPACE/.env
+          env | grep '^TF_VAR_' >> $GITHUB_WORKSPACE/.env
 
       - name: Lint action
         run: devbox run task lint
