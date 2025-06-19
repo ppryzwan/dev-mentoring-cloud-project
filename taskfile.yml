@@ -81,10 +81,10 @@ tasks:
     dir: "{{.TASKFILE_DIR}}"
     desc: "Initialize terraform workspace"
     vars:
-      BRANCH_NAME:
+      CURRENT_BRANCH:
         sh: git branch --show-current
     env:
-      BRANCH_NAME: "{{.BRANCH_NAME | default .BRANCH_NAME}}"
+      BRANCH_NAME: "{{.BRANCH_NAME | default .CURRENT_BRANCH}}"
     cmds:
       - bash terraform-workspaces.sh create $BRANCH_NAME
       - touch target_modules
@@ -92,11 +92,11 @@ tasks:
   delete_workspace:
     dir: "{{.TASKFILE_DIR}}"
     deps: [authenticate, install_packages]
-    vars:
-      BRANCH_NAME:
-        sh: git branch --show-current
     desc: "Delete terraform workspace and clean up modules compared to the PRD"
+    vars:
+      CURRENT_BRANCH:
+        sh: git branch --show-current
     env:
-      BRANCH_NAME: "{{.BRANCH_NAME | default .BRANCH_NAME}}"
+      BRANCH_NAME: "{{.BRANCH_NAME | default .CURRENT_BRANCH}}"
     cmds:
       - bash terraform-workspaces.sh delete $BRANCH_NAME
